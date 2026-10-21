@@ -116,7 +116,7 @@ canvas{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display
   </div>
 
   <div class="foot">
-    <p class="rule" id="rule">団子は1周だけ回ります。オレンジの縞を8本、白とかわりばんこに同じ幅で巻いてください。</p>
+    <p class="rule" id="rule">団子は1周だけ回ります。オレンジの縞を8本、白とかわりばんこに同じ幅で作ってください。</p>
     <section class="slip" id="slip" hidden>
       <div class="slip-top">
         <div class="score" id="score">0<small>点</small></div>
@@ -153,7 +153,7 @@ const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 function showBest(){const b=store.get('shima-best-'+N);$('best').innerHTML='自己ベスト（'+N+'本）<b>'+(b?b+'点':'—')+'</b>'}
 function setMode(n){N=n;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',String(+c.dataset.n===n)));
-  $('rule').textContent='オレンジの縞を'+n+'本、白とかわりばんこに同じ幅で巻いてください。'+(MODES[n].wob?'回る速さがゆらぎます。':'');reset();showBest()}
+  $('rule').textContent='オレンジの縞を'+n+'本、白とかわりばんこに同じ幅で作ってください。'+(MODES[n].wob?'回る速さがゆらぎます。':'');reset();showBest()}
 document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{if(phase==='ready'||phase==='done')setMode(+c.dataset.n)}));
 function reset(){phase='ready';d=0;rot=0;holding=false;bounds=[];result=null;twist=0;twisting=false;torn=false;needRelease=false;$('slip').hidden=true;$('sheet').hidden=true;$('rule').hidden=false;
   $('hint').innerHTML='押したら回り出す。<em>押してる間だけオレンジ</em>';$('hint').hidden=false;
