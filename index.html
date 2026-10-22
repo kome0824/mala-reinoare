@@ -198,7 +198,7 @@ function renderSlip(){
   const r=result;$('score').innerHTML=r.sc+'<small>点</small>';$('rank').textContent=rankOf(r.sc);
   $('meta').textContent='オレンジ '+r.oc+' / '+N+'本 ・ いちばん太い '+Math.round(r.max)+'° ・ 細い '+Math.round(r.min)+'°';
   let em='';for(let i=0;i<24;i++)em+=colorAt((i+.5)*15)==='o'?'🟧':'⬜';$('emoji').textContent=em;
-  const txt=headline(r.sc)+'\n'+N+'本しま｜'+r.sc+'点\n'+em+'\n'+URL_PLAY+'\n'+TAG;
+  const txt=headline(r.sc)+'\n'+N+'本しま｜'+r.sc+'点\n'+em+'\n'+TAG+'\n'+URL_PLAY;
   result.txt=txt;$('tip').innerHTML='<b>小ネタ</b>'+TIPS[Math.floor(Math.random()*TIPS.length)];
   $('rule').hidden=true;$('slip').hidden=false;
 }
@@ -308,7 +308,7 @@ const TIPS=[
 const TAG='#マーラータンの例のあれ';
 const URL_PLAY='https://kome0824.github.io/mala-reinoare/';
 let card=null,cardSeq=0,cardWait=null;
-const shareText=()=>headline(result.sc)+'\n'+N+'本しま｜'+result.sc+'点\n'+URL_PLAY+'\n'+TAG;
+const shareText=()=>headline(result.sc)+'\n'+N+'本しま｜'+result.sc+'点\n'+TAG+'\n'+URL_PLAY;
 function makeCard(){
   const id=++cardSeq,r=result,bs=bounds.map(b=>({...b})),n=N;
   const W=1200,H=675,R=180,cx=320,baseY=560;
