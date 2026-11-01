@@ -151,6 +151,7 @@ const MODES={4:{T:3.4,wob:0,name:'まかない'},8:{T:4.8,wob:0,name:'屋台'},1
 let N=8, phase='ready', d=0, T=3.5, holding=false, bounds=[], rot=0, last=0, wobPhase=0, idle=0, result=null, twist=0, twisting=false, torn=false, needRelease=false, armAt=0, pDown=false;
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function track(path,title){try{const gc=window.goatcounter;if(gc&&typeof gc.count==='function')gc.count({path,title,event:true})}catch(e){}}
 function showBest(){const b=store.get('shima-best-'+N);$('best').innerHTML='自己ベスト（'+N+'本）<b>'+(b?b+'点':'—')+'</b>'}
 function setMode(n){N=n;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',String(+c.dataset.n===n)));
   $('rule').textContent='オレンジの縞を'+n+'本、白とかわりばんこに同じ幅で作ってください。'+(MODES[n].wob?'回る速さがゆらぎます。':'');reset();showBest()}
@@ -163,7 +164,7 @@ function down(e){e.preventDefault();pDown=true;
   if(phase==='twist'){if(performance.now()<armAt||needRelease||twisting)return;twisting=true;$('hint').hidden=true;buzz(10);return}
   if(phase==='ready'){phase='spin';const m=MODES[N];T=m.T*(0.92+Math.random()*0.16);wobPhase=Math.random()*6.28;
     bounds=[{c:'o',a:0}];holding=true;last=performance.now();$('hint').hidden=true;
-    document.querySelectorAll('.chip').forEach(c=>c.disabled=true);buzz(12);return}
+    document.querySelectorAll('.chip').forEach(c=>c.disabled=true);buzz(12);track('mala-start-'+N,'遊び始め（'+N+'本）');return}
   if(phase==='spin'&&!holding){holding=true;bounds.push({c:'o',a:d});buzz(10)}
 }
 function up(){pDown=false;if(phase==='spin'&&holding){holding=false;bounds.push({c:'w',a:d});return}
@@ -181,7 +182,7 @@ function stripes(){
 }
 function colorAt(x){let c='w';for(const b of bounds){if(b.a<=x)c=b.c;else break}return c}
 function toTwist(){
-  holding=false;phase='done';doneAt=performance.now();buildLut();
+  holding=false;phase='done';doneAt=performance.now();buildLut();track('mala-result-'+N,'結果まで（'+N+'本）');
   const s=stripes();const oc=s.filter(x=>x.c==='o').length;const cnt=s.length;
   const ideal=360/Math.max(cnt,1);const dev=s.reduce((t,x)=>t+Math.abs(x.w-ideal),0)/Math.max(cnt,1);
   let even=100-(dev/ideal)*140;if(cnt<2)even=0;
@@ -350,14 +351,15 @@ const NOTE_SAVE=PHONE?'画像を長押しして「保存」か「コピー」を
 $('toX').textContent=PHONE?'Xを開く':'画像をコピーしてXを開く';$('note').textContent=NOTE_SAVE;
 $('share').addEventListener('click',async()=>{
   if(!result)return;
+  track('mala-share-tap','投稿ボタン');
   const c=card||await cardWait;if(!c)return;
   const text=shareText();
-  try{if(PHONE&&navigator.canShare&&navigator.canShare({files:[c.file]})){await navigator.share({files:[c.file],text});return}}
-  catch(e){if(e&&e.name==='AbortError')return}
+  try{if(PHONE&&navigator.canShare&&navigator.canShare({files:[c.file]})){await navigator.share({files:[c.file],text});track('mala-share-done','共有メニューで共有した');return}}
+  catch(e){if(e&&e.name==='AbortError'){track('mala-share-cancel','共有メニューをキャンセル');return}}
   $('card').src=c.url;$('toX').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(text);
-  $('note').textContent=NOTE_SAVE;$('sheet').hidden=false;
+  $('note').textContent=NOTE_SAVE;$('sheet').hidden=false;track('mala-share-sheet','画像の画面を出した');
 });
-$('toX').addEventListener('click',()=>{if(PHONE||!card)return;
+$('toX').addEventListener('click',()=>{track('mala-share-openx','画像の画面からXを開く');if(PHONE||!card)return;
   const ng=()=>{$('note').textContent='画像をコピーできませんでした。画像を右クリックで保存して、投稿に添付してください。'};
   try{navigator.clipboard.write([new ClipboardItem({'image/png':card.blob})]).then(()=>{$('note').textContent='画像をコピーしました。Xの投稿欄に貼り付けてください。'},ng)}catch(e){ng()}});
 $('close').addEventListener('click',()=>{$('sheet').hidden=true});
